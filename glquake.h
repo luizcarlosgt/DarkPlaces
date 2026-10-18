@@ -5,6 +5,15 @@
 
 #ifdef USE_GLES2
 #include <SDL_opengles2.h>
+
+// we use these internally even if we never deliver such data to the driver
+// (needed because some desktop-GL switch cases still get compiled under GLES2)
+#ifndef GL_BGR
+#define GL_BGR					0x80E0
+#endif
+#ifndef GL_BGRA
+#define GL_BGRA					0x80E1
+#endif
 #else
 //#include <SDL_opengl.h>
 //#include <SDL_opengl_glext.h>
