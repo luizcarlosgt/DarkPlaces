@@ -5,6 +5,14 @@
 
 #ifdef USE_GLES2
 #include <SDL_opengles2.h>
+#ifdef __EMSCRIPTEN__
+// The wasm build links with FULL_ES3 and MIN_WEBGL_VERSION=2 (WebGL2), where
+// 3D textures are core functionality, but the GLES2 headers above do not
+// declare them (glTexImage3D, GL_MAX_3D_TEXTURE_SIZE, GL_TEXTURE_WRAP_R...).
+// gl3.h skips its ES2 section when GLES2/gl2.h was already included, so this
+// only adds the ES3 declarations.
+#include <GLES3/gl3.h>
+#endif
 
 // we use these internally even if we never deliver such data to the driver
 // (needed because some desktop-GL switch cases still get compiled under GLES2)

@@ -6596,7 +6596,16 @@ static void Mod_Q3BSP_LoadLightGrid(lump_t *l)
 			lightgridmatrix[2][3] = -(loadmodel->brushq3.num_lightgrid_imins[2] - 1.5f) / texturesize[2];
 			lightgridmatrix[3][3] = 1;
 			Matrix4x4_FromArrayDoubleD3D(&loadmodel->brushq3.lightgridworldtotexturematrix, lightgridmatrix);
-			loadmodel->brushq3.lightgridtexture = R_LoadTexture3D(loadmodel->texturepool, "lightgrid", texturesize[0], texturesize[1], texturesize[2], texturergba, TEXTYPE_RGBA, TEXF_CLAMP, 0, NULL);
+			// R_LoadTexture3D would Sys_Error if the GL context can not hold a
+			// texture this size (vid.maxtexturesize_3d is 0 when 3D textures are
+			// unsupported), so skip the texture in that case; the data stays in
+			// loadmodel->brushq3.data_lightgrid for CPU-side light point sampling
+			if (vid.maxtexturesize_3d >= (unsigned int)texturesize[0]
+			 && vid.maxtexturesize_3d >= (unsigned int)texturesize[1]
+			 && vid.maxtexturesize_3d >= (unsigned int)texturesize[2])
+				loadmodel->brushq3.lightgridtexture = R_LoadTexture3D(loadmodel->texturepool, "lightgrid", texturesize[0], texturesize[1], texturesize[2], texturergba, TEXTYPE_RGBA, TEXF_CLAMP, 0, NULL);
+			else
+				Con_Printf("Mod_Q3BSP_LoadLightGrid: 3D textures unsupported or too small (max %u, need %i %i %i), lightgrid texture disabled\n", vid.maxtexturesize_3d, texturesize[0], texturesize[1], texturesize[2]);
 			Mem_Free(texturergba);
 		}
 	}

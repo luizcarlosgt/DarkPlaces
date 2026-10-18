@@ -807,16 +807,27 @@ void GL_Setup(void)
 	CHECKGLERROR
 #endif
 #ifdef GL_MAX_3D_TEXTURE_SIZE
-#ifdef USE_GLES2
-	if (GL_CheckExtension("GL_EXT_texture3D", "-notexture3d", false)
-	 || GL_CheckExtension("GL_OES_texture3D", "-notexture3d", false))
-#endif
 	{
-		qglGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, (GLint*)&vid.maxtexturesize_3d);
-		Con_DPrintf("GL_MAX_3D_TEXTURE_SIZE = %i\n", vid.maxtexturesize_3d);
-	}
+		qbool support3d = true;
+#ifdef USE_GLES2
+# ifdef __EMSCRIPTEN__
+		// the wasm build forces FULL_ES3 + MIN_WEBGL_VERSION=2 (WebGL2) where
+		// 3D textures are core, but WebGL2 does not advertise the
+		// GL_EXT/OES_texture3D extension names, so only the parms disable it
+		support3d = !(Sys_CheckParm("-notexture3d") || Sys_CheckParm("-safe"));
+# else
+		support3d = GL_CheckExtension("GL_EXT_texture3D", "-notexture3d", false)
+			|| GL_CheckExtension("GL_OES_texture3D", "-notexture3d", false);
+# endif
 #endif
+		if (support3d)
+		{
+			qglGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, (GLint*)&vid.maxtexturesize_3d);
+			Con_DPrintf("GL_MAX_3D_TEXTURE_SIZE = %i\n", vid.maxtexturesize_3d);
+		}
+	}
 	CHECKGLERROR
+#endif
 
 #ifdef USE_GLES2
 	Con_Print("Using GLES2 rendering path\n");
