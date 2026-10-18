@@ -33,6 +33,10 @@
 
 #include <signal.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include "quakedef.h"
 #include "taskqueue.h"
 #include "thread.h"
@@ -416,6 +420,13 @@ static void Sys_SetTimerResolution(void)
 
 double Sys_DirtyTime(void)
 {
+#ifdef __EMSCRIPTEN__
+	// emscripten_get_now() returns milliseconds as a double since page load.
+	// SDL_GetTicks() is Uint32 and overflows after ~49.7 days, causing
+	// catastrophic time-step oscillation (1.0 <-> 4294967297.0) in the browser.
+	return emscripten_get_now() * 0.001;
+#else
+
 	// first all the OPTIONAL timers
 
 	// benchmark timer (fake clock)
@@ -495,6 +506,7 @@ double Sys_DirtyTime(void)
 	// this calls Sys_Error() if not linking against SDL
 	return (double) Sys_SDL_GetTicks() / 1000.0;
 #endif
+#endif // __EMSCRIPTEN__
 }
 
 double Sys_Sleep(double time)
