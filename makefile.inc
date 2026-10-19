@@ -234,6 +234,8 @@ LDFLAGS_LINUXSDL=$(LDFLAGS_UNIXCOMMON) -lrt -ldl -rdynamic $(LDFLAGS_UNIXSDL)
 LDFLAGS_WASMJS=$(LDFLAGS_UNIXCOMMON) -s USE_SDL=2 \
                                    -s USE_LIBPNG=1 \
                                    -s USE_LIBJPEG=1 \
+                                   -s USE_OGG=1 \
+                                   -s USE_VORBIS=1 \
                                    -s USE_ZLIB=1 \
                                    -s INITIAL_MEMORY=128mb \
                                    -s MAXIMUM_MEMORY=2gb \
@@ -252,6 +254,8 @@ LDFLAGS_WASMJS=$(LDFLAGS_UNIXCOMMON) -s USE_SDL=2 \
 LDFLAGS_WASM=$(LDFLAGS_UNIXCOMMON) -s USE_SDL=2 \
                                    -s USE_LIBPNG=1 \
                                    -s USE_LIBJPEG=1 \
+                                   -s USE_OGG=1 \
+                                   -s USE_VORBIS=1 \
                                    -s USE_ZLIB=1 \
                                    -s INITIAL_MEMORY=128mb \
                                    -s MAXIMUM_MEMORY=2gb \

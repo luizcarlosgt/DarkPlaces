@@ -43,6 +43,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # define DP_MOBILETOUCH	1
 # define DP_FREETYPE_STATIC 1
 #elif defined(__EMSCRIPTEN__) //this also defines linux, so it must come first
+/* Link the decoders statically: emscripten cannot dlopen runtime libraries,
+ * so without these the engine tries to Sys_LoadDependency() libvorbis/libjpeg
+ * (which always fails in the browser) and every .ogg sound / .jpg texture
+ * fails to load.  Provided by the USE_VORBIS / USE_LIBJPEG ports. */
+# define LINK_TO_LIBVORBIS 1
+# define LINK_TO_LIBJPEG 1
 # define DP_OS_NAME		"Browser"
 # define DP_OS_STR		"browser"
 # define DP_ARCH_STR	"WASM-32"
