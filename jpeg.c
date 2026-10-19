@@ -458,6 +458,14 @@ dllhandle_t jpeg_dll = NULL;
 qbool jpeg_tried_loading = 0;
 #endif
 
+// libjpeg's boolean type (LINK_TO_LIBJPEG) may differ from our jboolean, so use
+// a type that matches the fill_input_buffer / empty_output_buffer callback fields.
+#ifdef LINK_TO_LIBJPEG
+typedef boolean jpeg_boolean_t;
+#else
+typedef jboolean jpeg_boolean_t;
+#endif
+
 static unsigned char jpeg_eoi_marker [2] = {0xFF, JPEG_EOI};
 static jmp_buf error_in_jpeg;
 static qbool jpeg_toolarge;
@@ -554,7 +562,7 @@ void JPEG_CloseLibrary (void)
 
 static void JPEG_Noop (j_decompress_ptr cinfo) {}
 
-static jboolean JPEG_FillInputBuffer (j_decompress_ptr cinfo)
+static jpeg_boolean_t JPEG_FillInputBuffer (j_decompress_ptr cinfo)
 {
     // Insert a fake EOI marker
     cinfo->src->next_input_byte = jpeg_eoi_marker;
@@ -730,7 +738,7 @@ static void JPEG_InitDestination (j_compress_ptr cinfo)
 	dest->pub.free_in_buffer = JPEG_OUTPUT_BUF_SIZE;
 }
 
-static jboolean JPEG_EmptyOutputBuffer (j_compress_ptr cinfo)
+static jpeg_boolean_t JPEG_EmptyOutputBuffer (j_compress_ptr cinfo)
 {
 	my_dest_ptr dest = (my_dest_ptr)cinfo->dest;
 
@@ -775,7 +783,7 @@ static void JPEG_Mem_InitDestination (j_compress_ptr cinfo)
 	dest->pub.free_in_buffer = dest->bufsize;
 }
 
-static jboolean JPEG_Mem_EmptyOutputBuffer (j_compress_ptr cinfo)
+static jpeg_boolean_t JPEG_Mem_EmptyOutputBuffer (j_compress_ptr cinfo)
 {
 	my_dest_ptr dest = (my_dest_ptr)cinfo->dest;
 	jpeg_toolarge = true;
