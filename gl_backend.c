@@ -970,10 +970,12 @@ int R_Mesh_CreateFramebufferObject(rtexture_t *depthtexture, rtexture_t *colorte
 		CHECKGLERROR
 		qglGenFramebuffers(1, (GLuint*)&temp);CHECKGLERROR
 
-#ifndef USE_GLES2
-		R_Mesh_SetRenderTargets(temp);  // This breaks GLES2.
-		// GL_ARB_framebuffer_object (GL3-class hardware) - depth stencil attachment
-#endif
+		// the FBO must be bound before attaching: GL_FRAMEBUFFER refers to the
+		// currently bound FBO, so attaching while 0 is bound targets the default
+		// framebuffer and fails (WebGL: "no framebuffer bound"); this used to be
+		// skipped on GLES2 with a stale "This breaks GLES2" comment, but
+		// R_Mesh_SetRenderTargets only calls glBindFramebuffer and is safe here
+		R_Mesh_SetRenderTargets(temp);
 
 #ifdef USE_GLES2
 		// FIXME: separate stencil attachment on GLES
