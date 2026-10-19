@@ -122,6 +122,8 @@ ifeq ($(DP_MAKE_TARGET), wasm)
 	              -s USE_LIBPNG=1 \
 	              -s USE_LIBJPEG=1 \
 	              -s USE_ZLIB=1 \
+	              -s USE_OGG=1 \
+	              -s USE_VORBIS=1 \
 	              -DNOSUPPORTIPV6 \
 	              -DUSE_GLES2
 
